@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GovEase — Find Your Government Schemes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b1120;
+      --card: #131d30;
+      --border: #1e2d45;
+      --saffron: #ff9933;
+      --green: #19a84a;
+      --blue: #3b82f6;
+      --text: #e8edf5;
+      --muted: #6b7f99;
+      --radius: 14px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--saffron), #ff6b00);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    header h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    header span {
+      color: var(--saffron);
+    }
+
+    .badge {
+      margin-left: auto;
+      background: rgba(255,153,51,0.12);
+      border: 1px solid rgba(255,153,51,0.3);
+      color: var(--saffron);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 64px 20px 40px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .hero h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 14px;
+    }
+
+    .hero h2 em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--saffron), #ff6b00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* SEARCH BOX */
+    .search-box {
+      max-width: 720px;
+      margin: 0 auto 48px;
+      padding: 0 20px;
+    }
+
+    .input-wrapper {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      transition: border-color 0.2s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--saffron);
+    }
+
+    .input-wrapper label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      resize: none;
+      line-height: 1.6;
+      min-height: 90px;
+    }
+
+    textarea::placeholder { color: var(--muted); }
+
+    .input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .examples {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .example-chip {
+      background: rgba(255,153,51,0.08);
+      border: 1px solid rgba(255,153,51,0.2);
+      color: var(--saffron);
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .example-chip:hover { background: rgba(255,153,51,0.18); }
+
+    .search-btn {
+      background: linear-gradient(135deg, var(--saffron), #ff6b00);
+      color: #fff;
+      border: none;
+      padding: 11px 28px;
+      border-radius: 10px;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* LOADING */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--saffron);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading p { color: var(--muted); font-size: 0.9rem; }
+
+    /* RESULTS */
+    #results { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+
+    .summary-bar {
+      background: rgba(25, 168, 74, 0.1);
+      border: 1px solid rgba(25, 168, 74, 0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--green);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .schemes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 16px;
+    }
+
+    .scheme-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: border-color 0.2s, transform 0.2s;
+      animation: fadeUp 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    .scheme-card:hover {
+      border-color: rgba(255,153,51,0.4);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .scheme-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tag-farmer   { background: rgba(25,168,74,0.15); color: var(--green); }
+    .tag-student  { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .tag-women    { background: rgba(236,72,153,0.15); color: #ec4899; }
+    .tag-health   { background: rgba(239,68,68,0.15); color: #f87171; }
+    .tag-housing  { background: rgba(234,179,8,0.15); color: #eab308; }
+    .tag-business { background: rgba(168,85,247,0.15); color: #a855f7; }
+    .tag-banking  { background: rgba(255,153,51,0.15); color: var(--saffron); }
+    .tag-default  { background: rgba(107,127,153,0.15); color: var(--muted); }
+
+    .ministry {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .benefit {
+      font-size: 0.9rem;
+      color: #c5d0e0;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .eligibility-text {
+      font-size: 0.85rem;
+      color: var(--green);
+      background: rgba(25,168,74,0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .docs-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .doc-chip {
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      color: #93c5fd;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .apply-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--saffron);
+      font-weight: 500;
+    }
+
+    /* ERROR */
+    .error-box {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #f87171;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🇮🇳</div>
+  <h1>Gov<span>Ease</span></h1>
+  <div class="badge">Powered by Gemini AI</div>
+</header>
+
+<div class="hero">
+  <h2>Find every scheme<br/>you <em>deserve</em></h2>
+  <p>Tell us about yourself in plain language. Gemini AI matches you with<br/>the right government schemes in seconds.</p>
+</div>
+
+<div class="search-box">
+  <div class="input-wrapper">
+    <label>Describe your situation</label>
+    <textarea id="userInput" placeholder="e.g. I am a farmer in Assam with 2 acres of land. My annual income is below 1 lakh. I have a daughter in class 10..."></textarea>
+    <div class="input-footer">
+      <div class="examples">
+        <span class="example-chip" onclick="fillExample('farmer')">👨‍🌾 Farmer</span>
+        <span class="example-chip" onclick="fillExample('student')">🎓 Student</span>
+        <span class="example-chip" onclick="fillExample('women')">👩 Women / BPL</span>
+        <span class="example-chip" onclick="fillExample('startup')">💼 Entrepreneur</span>
+      </div>
+      <button class="search-btn" id="searchBtn" onclick="findSchemes()">Find Schemes →</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p>Gemini is finding your matching schemes...</p>
+</div>
+
+<div id="results"></div>
+
+<script>
+  const examples = {
+    farmer: "I am a farmer in Assam. I own 2 acres of agricultural land. My family income is below 1.5 lakh per year. I have 2 children and want crop insurance.",
+    student: "I am a 19 year old SC category student doing BTech in Assam. My family income is below 2.5 lakh per year. I need scholarship support.",
+    women: "I am a married woman from a BPL family in rural Assam. I don't have an LPG connection. My husband is a daily wage worker. We don't own a house.",
+    startup: "I am 24 years old and want to start a small tailoring business. I belong to OBC category. I need a small loan to buy sewing machines."
+  };
+
+  function fillExample(type) {
+    document.getElementById('userInput').value = examples[type];
+  }
+
+  function getTagClass(tag) {
+    if (!tag) return 'tag-default';
+    const t = tag.toLowerCase();
+    if (t.includes('farmer')) return 'tag-farmer';
+    if (t.includes('student')) return 'tag-student';
+    if (t.includes('women') || t.includes('woman')) return 'tag-women';
+    if (t.includes('health')) return 'tag-health';
+    if (t.includes('housing')) return 'tag-housing';
+    if (t.includes('business')) return 'tag-business';
+    if (t.includes('banking')) return 'tag-banking';
+    return 'tag-default';
+  }
+
+  async function findSchemes() {
+    const input = document.getElementById('userInput').value.trim();
+    if (!input) return alert('Please describe your situation first.');
+
+    const btn = document.getElementById('searchBtn');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+
+    btn.disabled = true;
+    loading.style.display = 'block';
+    results.innerHTML = '';
+
+    try {
+      const res = await fetch('/api/schemes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userDescription: input })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        results.innerHTML = `<div class="error-box">⚠️ ${data.error || 'Something went wrong. Please try again.'}</div>`;
+        return;
+      }
+
+      renderResults(data);
+    } catch (err) {
+      results.innerHTML = `<div class="error-box">⚠️ Network error. Make sure the server is running.</div>`;
+    } finally {
+      btn.disabled = false;
+      loading.style.display = 'none';
+    }
+  }
+
+  function renderResults(data) {
+    const results = document.getElementById('results');
+
+    let html = '';
+
+    if (data.summary) {
+      html += `<div class="summary-bar">✅ ${data.summary}</div>`;
+    }
+
+    if (!data.schemes || data.schemes.length === 0) {
+      html += `<div class="error-box">No matching schemes found. Try describing more details.</div>`;
+      results.innerHTML = html;
+      return;
+    }
+
+    html += `<div class="schemes-grid">`;
+
+    data.schemes.forEach((scheme, i) => {
+      const tagClass = getTagClass(scheme.tag);
+      const docsHtml = (scheme.documents || []).map(d => `<span class="doc-chip">📄 ${d}</span>`).join('');
+      const delay = i * 80;
+
+      html += `
+        <div class="scheme-card" style="animation-delay: ${delay}ms">
+          <div class="card-header">
+            <div class="scheme-name">${scheme.name || 'Unknown Scheme'}</div>
+            <span class="tag ${tagClass}">${scheme.tag || 'General'}</span>
+          </div>
+          <div class="ministry">🏛️ ${scheme.ministry || 'Government of India'}</div>
+          <div class="benefit">💰 ${scheme.benefit || 'See official portal for details'}</div>
+
+          <div class="section-label">Why you qualify</div>
+          <div class="eligibility-text">✓ ${scheme.eligibility || 'Matches your profile'}</div>
+
+          <div class="section-label">Documents needed</div>
+          <div class="docs-list">${docsHtml || '<span class="doc-chip">Check official portal</span>'}</div>
+
+          <div class="apply-link">🔗 Apply at: ${scheme.applyAt || 'Visit nearest CSC / official website'}</div>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+    results.innerHTML = html;
+  }
+
+  // Allow Ctrl+Enter to submit
+  document.getElementById('userInput').addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'Enter') findSchemes();
+  });
+</script>
+
+</body>
+</html>
